@@ -65,20 +65,26 @@ public class JavaSourceAnalyzer {
         alTopFiles.sort(String::compareTo);
         hmFilesAndImports.forEach((k, v) -> alOtherFiles.add(k));
         alOtherFiles.sort(String::compareTo);
-        System.out.println("-- " + alTopFiles.size() + " top level files (do not use import)");
+        System.out.println("-> " + alTopFiles.size() + " top level files (do not use import)");
+        System.out.println("-----------------------------------------------------------------------");
 //        alTopFiles.forEach(s -> System.out.println(s));
 //        alTopFiles.forEach(s -> System.out.println(s + (isImportedFile(s) ? " imported" : "")));
         alTopFiles.forEach(s -> System.out.println(s + importInfo(s)));
 //        alTopFiles.forEach(s -> hmFilesAndImportsOld.remove(s));
-        System.out.println("-- other files");
+        System.out.println("");
+        System.out.println("-> " + alOtherFiles.size() + " other files (use import)");
+        System.out.println("-----------------------------------------------------------------------");
 //        hmFilesAndImportsOld.forEach((k, v) -> System.out.println("file: " + k + " import:" + v));
 
         for (int i = 0; i < alOtherFiles.size(); i++) {
             ArrayList<String> als = hmFilesAndImports.get(alOtherFiles.get(i));
             als.sort(String::compareTo);
+            String sImports = "";
             for (int j = 0; j < als.size(); j++) {
-                System.out.println(alOtherFiles.get(i) + " " + als.get(j));
+                sImports += (sImports.length() == 0 ? "" : ", ") + als.get(j) + (isTopLevelFile(als.get(j)) ? " top" : "");
+//                System.out.println(alOtherFiles.get(i) + " " + als.get(j) + " " + (isTopLevelFile(als.get(j)) ? " top" : ""));
             }
+            System.out.println(alOtherFiles.get(i) + " " + sImports);
         }
     }
 
@@ -93,16 +99,18 @@ public class JavaSourceAnalyzer {
         return ((sRetVal.length() == 0 ? "" : " used by: [") + sRetVal + (sRetVal.length() == 0 ? "" : "]"));
     }
 
+    private boolean isTopLevelFile(String sName) {
+        return (alTopFiles.contains(sName));
+    }
+
 //    private boolean isImportedFile(String sName) {
 //        return (hsImportedFiles.contains(sName));
 //    }
-
 //    private void addToTop(String sFileName, String sImport) {
 //        if (sImport.length() == 0) {
 //            alTopFiles.add(sFileName);
 //        }
 //    }
-
     private void collectSourceFiles(String sFullName, ArrayList<String> alSourceFiles) {
         File f = new File(sFullName);
         if (!f.exists()) {
